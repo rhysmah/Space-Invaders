@@ -7,8 +7,9 @@ use crossterm::{
 
 use invaders::{
     render, 
-    frame::{self, new_frame}};
-    
+    frame::{self, new_frame, Drawable},
+    player::{Player, self}};
+
 use rusty_audio::Audio;
 
 
@@ -60,14 +61,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     ///////////////
     // GAME LOOP //
     ///////////////
+    let mut player = Player::new();
     'game_loop: loop {
         // Per-frame init
-        let curr_frame = new_frame();
+        let mut curr_frame = new_frame();
 
         // Input
         while crossterm::event::poll(Duration::default())? {
             if let Event::Key(key_event) = crossterm::event::read()? {
                 match key_event.code {
+                    KeyCode::Left => player.move_left(),
+                    KeyCode::Right => player.move_right(),
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'game_loop
@@ -76,7 +80,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+
         // Draw and render
+        player.draw(&mut curr_frame);
         let _ = render_tx.send(curr_frame);
         std::thread::sleep(Duration::from_millis(1));
     }
