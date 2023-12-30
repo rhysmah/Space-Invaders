@@ -96,6 +96,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             audio.play("move");
         }
 
+        if player.detect_hits(&mut invaders) {
+            audio.play("explode");
+        }
+
         // Draw and render
         let drawables: Vec<&dyn Drawable> = vec![&player, &invaders];
         for drawable in drawables {
@@ -103,6 +107,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
         let _ = render_tx.send(curr_frame);
         std::thread::sleep(Duration::from_millis(1));
+
+        // Win or lose condition
+        if invaders.all_killed() {
+            audio.play("win");
+            break 'game_loop;
+        }
+        if invaders.reached_bottom() {
+            audio.play("lost");
+            break 'game_loop;
+        }
     }
     
     /////////////
