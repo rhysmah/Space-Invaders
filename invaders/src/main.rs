@@ -1,4 +1,4 @@
-use std::{error::Error, io, time::Duration, sync::mpsc};
+use std::{error::Error, io, time::{Duration, Instant}, sync::mpsc};
 
 use crossterm::{
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, 
@@ -62,8 +62,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     // GAME LOOP //
     ///////////////
     let mut player = Player::new();
+    let mut instant = Instant::now();
     'game_loop: loop {
         // Per-frame init
+        let delta = instant.elapsed();
+        instant = Instant::now();
         let mut curr_frame = new_frame();
 
         // Input
@@ -72,6 +75,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 match key_event.code {
                     KeyCode::Left => player.move_left(),
                     KeyCode::Right => player.move_right(),
+                    KeyCode::Char(' ') => {
+                        if player.shoot() {
+                            audio.play("pew");
+                        }
+                    }
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'game_loop
@@ -80,6 +88,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+
+        // Updates
+        player.update(delta);
 
         // Draw and render
         player.draw(&mut curr_frame);
