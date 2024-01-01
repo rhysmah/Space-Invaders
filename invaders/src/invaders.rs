@@ -1,4 +1,4 @@
-use std::{fs::DirBuilder, time::Duration, cmp::max};
+use std::{time::Duration, cmp::max};
 
 use rusty_time::timer::Timer;
 

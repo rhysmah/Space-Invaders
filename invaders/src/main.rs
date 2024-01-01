@@ -8,7 +8,7 @@ use crossterm::{
 use invaders::{
     render, 
     frame::{self, new_frame, Drawable},
-    player::{Player, self}, invaders::Invaders};
+    player::Player, invaders::Invaders};
 
 use rusty_audio::Audio;
 
